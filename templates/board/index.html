@@ -25,18 +25,34 @@
 					</tr>
 					{% for board in board_list %}
 					<tr>
-						<td>{{ board.id }}</td>
+						<td>{{ board_list.count | sub:forloop.counter | add:1 }}</td>
 						<td><a href="/board/view?id={{ board.id }}">{{ board.title }}</a></td>
 						<td>{{ board.user.name }}</td>
 						<td>{{ board.hit }}</td>
 						<td>{{ board.regdate }}</td>
 						<td>
-							<a href="" class="del">삭제</a>
+							{% if request.session.authuser is not None and request.session.authuser.id == board.user_id %}
+							<a href="/board/delete?id={{ board.id }}" class="del">삭제</a>
+							{% endif %}
 						</td>
 					</tr>
 					{% endfor %}
 
 				</table>
+
+				<!-- pager 추가 -->
+				<div class="pager">
+					<ul>
+						<li><a href="">◀</a></li>
+						<li><a href="">1</a></li>
+						<li class="selected">2</li>
+						<li><a href="">3</a></li>
+						<li>4</li>
+						<li>5</li>
+						<li><a href="">▶</a></li>
+					</ul>
+				</div>
+				<!-- pager 추가 -->
 
 				{% if request.session.authuser is not None %}
 				<div class="bottom">
