@@ -6,11 +6,9 @@ from board.models import Board
 
 
 def index(request):
-    # board_list = Board.objects.all().order_by('-regdate')
-    # for board in board_list:
-    #     print(board.id, board.title, board.user)
-
-    return render(request, 'board/index.html')
+    board_list = Board.objects.all().order_by('-regdate')
+    data = {'board_list': board_list}
+    return render(request, 'board/index.html', data)
 
 
 def write(request):
@@ -20,26 +18,36 @@ def write(request):
     return render(request, 'board/write.html')
 
 
+def add(request):
+    if request.session.get('authuser') is None:
+        return HttpResponseRedirect('/')
 
-
-
-
-def create(request):
     board = Board()
-    board.title = 'test'
-    board.contents = 'test'
-    board.user_id = 1
+    board.title = request.POST['title']
+    board.contents = request.POST['contents']
+    board.user_id = request.session['authuser']['id']
 
     board.save()
 
-    return HttpResponse('ok')
+    return HttpResponseRedirect('/board')
 
 
-def readone(request):
-    # /board/view?id=4
-    board = Board.objects.get(id=4)
-    print(board.id, board.title, board.contents, board.user.name)
-    return HttpResponse('ok')
+def view(request):
+    board_id = request.GET['id']
+    board = Board.objects.get(id=board_id)
+    data = {'board': board}
+    return render(request, 'board/view.html', data)
+
+
+def updateform(request):
+    board_id = request.GET['id']
+    try:
+        board = Board.objects.get(id=board_id, user_id=request.session['authuser']['id'])
+    except Exception :
+        return HttpResponseRedirect('/')
+
+    data = {'board': board}
+    return render(request, 'board/updateform.html', data)
 
 
 def update(request):
